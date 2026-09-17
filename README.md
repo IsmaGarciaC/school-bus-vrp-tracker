@@ -23,4 +23,4 @@ Diseñar un sistema completo (Frontend + Backend + Motor de Optimización) que p
 - [ ] Fase 4: Motor de optimización VRP.
 
 
-"Estoy construyendo busetas-dashboard: un sistema de optimización de rutas escolares en Cuenca, Ecuador (31 busetas) con FastAPI, Leaflet y OR-Tools. Mi objetivo es aprender ingeniería de software paso a paso sin que escribas código a ciegas por mí; yo tomo las decisiones y diseño la arquitectura con tu guía como mentor. Actualmente estoy en el hito: [aquí pegas en qué paso vas, ej. Creando el mapa interactivo con Leaflet]. Aquí está mi archivo ARCHITECTURE.md / README.md: [pegas el texto]. ¿Qué paso sigue?"
+

@@ -23,3 +23,8 @@ Alternative evaluated: React/Vue with Mapbox GL or `react-leaflet`.
 #### Negative:
 * **Manual State Sync:** Application state (`students` collection) must be synchronized manually with the DOM and map instances.
 * **Scalability Trade-off:** Complex UI additions will require strict architectural discipline or eventual migration to a component-driven framework if view complexity grows substantially.
+
+### Scale Considerations & Performance Thresholds
+* **Dataset Volume:** ~600–800 student stops and 32 bus route polylines.
+* **Rendering Strategy:** Standard DOM markers (`L.marker`) become a bottleneck at >300 elements. We will transition stop rendering to Canvas-based layers (`L.circleMarker` with `preferCanvas: true`) or Leaflet marker clusters.
+* **DOM Virtualization:** The lateral sidebar must implement filtering by bus/sector to avoid mounting hundreds of DOM nodes concurrently.

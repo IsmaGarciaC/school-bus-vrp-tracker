@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Bus VRP Tracker</title>
+
+    <!-- 1. Cargar los estilos visuales de Leaflet desde un CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        /* Quitar márgenes por defecto y hacer que el mapa ocupe toda la pantalla */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+        }
+
+        #map {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Contenedor donde Leaflet inyectará el mapa -->
+    <div id="map"></div>
+
+    <!-- Sidebar para mostrar la lista de estudiantes -->
+    <aside id="sidebar"
+        style="position: absolute; top: 10px; right: 10px; z-index: 1000; background: white; padding: 12px; width: 220px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+        <h4 style="margin: 0 0 8px 0;">Students (<span id="total-count">0</span>)</h4>
+        <ul id="student-list" style="padding-left: 18px; margin: 0; max-height: 200px; overflow-y: auto;"></ul>
+    </aside>
+
+    <!-- 2. Cargar el motor JavaScript de Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Array para almacenar los estudiantes
+        const students = [];
+
+        // Inicializar el mapa centrado en Cuenca, Ecuador
+        const cuencaLat = -2.9001;
+        const cuencaLng = -79.0059;
+        const map = L.map('map').setView([cuencaLat, cuencaLng], 14);
+
+        // Conectar el mapa con OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Escuchar los clics del usuario sobre las calles
+        map.on('click', function (e) {
+            const lat = e.latlng.lat.toFixed(5);
+            const lng = e.latlng.lng.toFixed(5);
+
+            // Mostrar un popup para agregar el nombre del estudiante
+            const popup = L.popup()
+                .setLatLng([lat, lng])
+                .setContent(`
+                    <b>Add Student Stop</b><br>
+                    <input type="text" id="student-name" placeholder="Student name"><br>
+                    <button id="btn-save" onclick="saveStudent(${lat}, ${lng})">Save</button><br>
+                    <small>Lat: ${lat}, Lng: ${lng}</small>
+                `)
+                .openOn(map);
+            popup.on('close', function () {
+                console.log('Popup closed');
+            });
+            console.log(`Coordenadas capturadas: ${lat}, ${lng}`);
+        });
+
+
+        // Función para guardar el nombre del estudiante
+        function saveStudent(lat, lng) {
+            const studentName = document.getElementById('student-name').value;
+            
+            // Validar que el nombre del estudiante no esté vacío
+            if (!studentName.trim()) {
+                alert('Please enter a student name');
+                return;
+            }
+            if (students.some(student => student.name === studentName)) {
+                alert('Student already exists');
+                return;
+            }
+            const newStudent = {
+                id: students.length + 1,
+                name: studentName,
+                lat: parseFloat(lat),
+                lng: parseFloat(lng)
+            };
+            map.closePopup();
+            const marker = L.marker([lat, lng]).addTo(map).bindPopup(`${studentName}`);
+            newStudent.marker = marker;
+            students.push(newStudent);
+
+            renderStudentsList();
+            console.log('Registered Students:', students);
+
+        }
+
+    
+        function renderStudentsList() {
+            const studentList = document.getElementById('student-list');
+            studentList.innerHTML = '';
+            students.forEach(student => {
+                const li = document.createElement('li');
+                li.textContent = student.name;
+                li.style.cursor = 'pointer';
+                li.addEventListener('click', function () {
+                    map.flyTo([student.lat, student.lng], 14);
+                    student.marker.openPopup();
+                });
+                studentList.appendChild(li);
+            });
+            const totalCount = document.getElementById('total-count');
+            totalCount.textContent = students.length;
+        }
+    </script>
+</body>
+</html> 
